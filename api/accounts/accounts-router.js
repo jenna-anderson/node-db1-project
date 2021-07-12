@@ -1,6 +1,12 @@
 const router = require('express').Router()
 const Accounts = require('./accounts-model')
-const { checkAccountId, checkAccountPayload } = require('./accounts-middleware')
+const { checkAccountId, checkAccountPayload, checkAccountNameUnique } = require('./accounts-middleware')
+
+if (!String.prototype.trim) {
+  String.prototype.trim = function () {
+    return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+  };
+}
 
 router.get('/', async (req, res, next) => {
   try {
@@ -21,18 +27,19 @@ router.get('/:id', checkAccountId, async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', checkAccountPayload, checkAccountNameUnique, async (req, res, next) => {
   try {
-    const account = req.body
-    const newlyCreatedAccount = await Accounts.create(account)
+    const fullName = req.body.name
+    const name = fullName.trim()
+    const budget = req.body.budget
+    const newlyCreatedAccount = await Accounts.create({ name, budget })
     res.status(201).json(newlyCreatedAccount)
   } catch(err) {
-    console.log(err)
     next(err)
   }
 })
 
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', checkAccountId, checkAccountPayload, async (req, res, next) => {
   try {
   const { id } = req.params
   const account = req.body
@@ -43,7 +50,7 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', checkAccountId, async (req, res, next) => {
   try {
     const { id } = req.params
     const deletedAccount = await Accounts.deleteById(id)
