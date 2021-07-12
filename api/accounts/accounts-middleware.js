@@ -11,7 +11,7 @@ if (!String.prototype.trim) {
 exports.checkAccountPayload = (req, res, next) => {
   const fullName = req.body.name
   const budget = req.body.budget
-  if(!fullName || !budget){
+  if(!fullName || !budget && isNaN(budget)){
     next({
       status: 400,
       message: 'name and budget are required'
