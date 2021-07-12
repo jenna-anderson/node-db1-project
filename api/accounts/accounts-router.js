@@ -32,16 +32,32 @@ router.post('/', async (req, res, next) => {
   }
 })
 
-router.put('/:id', (req, res, next) => {
-  // DO YOUR MAGIC
+router.put('/:id', async (req, res, next) => {
+  try {
+  const { id } = req.params
+  const account = req.body
+  const updatedPost = await Accounts.updateById(id, account)
+  res.status(200).json(updatedPost)
+  } catch(err) {
+    next(err)
+  }
 });
 
-router.delete('/:id', (req, res, next) => {
-  // DO YOUR MAGIC
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const deletedAccount = await Accounts.deleteById(id)
+    res.status(200).json(deletedAccount)
+  } catch(err) {
+    next(err)
+  }
 })
 
 router.use((err, req, res, next) => { // eslint-disable-line
-  // DO YOUR MAGIC
+  const status = err.status || 500
+  res.status(status).json({
+      message: err.message
+  })
 })
 
 module.exports = router;

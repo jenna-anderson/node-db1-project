@@ -13,21 +13,25 @@ exports.checkAccountPayload = (req, res, next) => {
   console.log(name, trimmedName)
   if(!trimmedName || !budget){
     console.log('missing value')
-    res.status(400).json({
+    next({
+      status: 400,
       message: 'name and budget are required'
     })
   } else if (typeof name !== 'string') {
     console.log('not string')
-    res.status(400).json({
-      message: "name of account must be a string"
+    next({
+      status: 400,
+      message: 'name of account must be a string'
     })
   } else if (name.trim().length < 3 || name.trim().length > 100) {
     console.log('name length')
-    res.status(400).json({
+    next({
+      status: 400,
       message: 'name of account must be between 3 and 100'
     })
   } else if (typeof budget !== 'number') {
-    res.status(400).json({
+    next({
+      status: 400,
       message: 'budget of account must be a number'
     })
   } else {
